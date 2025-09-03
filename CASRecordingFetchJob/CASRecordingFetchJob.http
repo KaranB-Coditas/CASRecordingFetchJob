@@ -1,0 +1,6 @@
+@CASRecordingFetchJob_HostAddress = http://localhost:5178
+
+GET {{CASRecordingFetchJob_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

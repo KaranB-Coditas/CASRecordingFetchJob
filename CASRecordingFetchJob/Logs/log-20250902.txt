@@ -1,0 +1,132 @@
+2025-09-02 19:41:53.681 +05:30 [INF] Now listening on: https://localhost:7108
+2025-09-02 19:41:53.722 +05:30 [INF] Now listening on: http://localhost:5178
+2025-09-02 19:41:53.789 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-02 19:41:53.792 +05:30 [INF] Hosting environment: Development
+2025-09-02 19:41:53.792 +05:30 [INF] Content root path: C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob
+2025-09-02 19:41:54.210 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/swagger/index.html - null null
+2025-09-02 19:41:54.356 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/swagger/index.html - 200 null text/html;charset=utf-8 153.4126ms
+2025-09-02 19:41:54.368 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/_vs/browserLink - null null
+2025-09-02 19:41:54.368 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/_framework/aspnetcore-browser-refresh.js - null null
+2025-09-02 19:41:54.386 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/_framework/aspnetcore-browser-refresh.js - 200 13792 application/javascript; charset=utf-8 19.6104ms
+2025-09-02 19:41:54.407 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/_vs/browserLink - 200 null text/javascript; charset=UTF-8 39.967ms
+2025-09-02 19:41:54.439 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/swagger/v1/swagger.json - null null
+2025-09-02 19:41:54.447 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 8.2902ms
+2025-09-02 19:42:13.509 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/api/RecordingJob/executerecordingjob?companyId=0&leadtransitId=2043481607 - null null
+2025-09-02 19:42:13.520 +05:30 [INF] Executing endpoint 'CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob)'
+2025-09-02 19:42:13.574 +05:30 [INF] Route matched with {action = "Execute", controller = "RecordingJob"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Execute(System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], Int32, Int32) on controller CASRecordingFetchJob.Controllers.RecordingJobController (CASRecordingFetchJob).
+2025-09-02 19:42:14.044 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:14.0445420+05:30" | Recording Job Started
+2025-09-02 19:42:14.057 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:14.0575322+05:30" | Fetching company ids to process recording job
+2025-09-02 19:42:14.725 +05:30 [WRN] No store type was specified for the decimal property 'Growth' on entity type 'Company'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2025-09-02 19:42:14.728 +05:30 [WRN] No store type was specified for the decimal property 'Revenue' on entity type 'Company'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+2025-09-02 19:42:21.751 +05:30 [INF] Executed DbCommand (333ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[ID]
+FROM [t_Company] AS [t]
+WHERE [t].[IsDeleted] = CAST(0 AS bit)
+2025-09-02 19:42:22.285 +05:30 [INF] Executed DbCommand (272ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CompanyId]
+FROM [cas_CompanySetting] AS [c]
+WHERE [c].[SettingKey] = N'DisableRecordingDownloadFromJob' AND [c].[SettingValue] = N'True'
+2025-09-02 19:42:22.290 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:22.2903216+05:30" | DisableRecordingDownloadFromJob CompanyIds System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:42:22.566 +05:30 [INF] Executed DbCommand (269ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CompanyId]
+FROM [cas_CompanySetting] AS [c]
+WHERE [c].[SettingKey] = N'EnableRealTimeRecording' AND [c].[SettingValue] = N'True'
+2025-09-02 19:42:22.570 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:22.5703640+05:30" | EnableRealTimeRecording CompanyIds System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:42:22.574 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:22.5744090+05:30" | Removed Company Ids from Job System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:42:22.577 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:22.5778772+05:30" | Company Ids to Process for Job System.Collections.Generic.List`1[System.Int32]
+2025-09-02 19:42:22.986 +05:30 [INF] Executed DbCommand (310ms) [Parameters=[@__leadtransitId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT COALESCE([c].[LeadTransitId], 0) AS [LeadtransitId], COALESCE([t].[LeadCatchTime], '0001-01-01T00:00:00.0000000') AS [LeadCatchTime], COALESCE([t].[PrimaryNumberIndex], 0) AS [PrimaryNumberIndex], COALESCE([t].[ContactTel1], N'') AS [ContactTel1], COALESCE([t].[ContactTel2], N'') AS [ContactTel2], COALESCE([t].[ContactTel3], N'') AS [ContactTel3], COALESCE([t].[BestPhoneNumber], N'') AS [BestPhoneNumber], COALESCE([t].[CallType], CAST(0 AS tinyint)) AS [CallType], COALESCE([t].[ClientId], 0) AS [ClientId]
+FROM [cas_Note] AS [c]
+INNER JOIN [t_Call] AS [t] ON [c].[LeadTransitId] = [t].[LeadTransitId]
+WHERE [c].[LeadTransitId] = @__leadtransitId_0
+2025-09-02 19:42:22.993 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:22.9938078+05:30" | Conversation Count 1
+2025-09-02 19:42:23.008 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:23.0085364+05:30" | [0] [2043481607] Started Processing Recording for LeadtransitId 2043481607, Conversation on 8/19/2025 8:06:29 AM PST
+2025-09-02 19:42:23.017 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:23.0176259+05:30" | [0] [2043481607] Fetch Recording from CDR, Callable Number 14404522965
+2025-09-02 19:42:23.019 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:23.0199510+05:30" | [0] [2043481607] CDR Url http://cdr.connectandsell.com/php/api.php?task=getVoipCalls&user=deepak&password=il0vecas&params={"startTime":"8/19/2025 8:05:29 AM","startTimeTo":"8/19/2025 8:08:29 AM","called":"14404522965"}
+2025-09-02 19:42:23.830 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:23.8306110+05:30" | [0] [2043481607] Found CDR, cdr id 396612847
+2025-09-02 19:42:23.832 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:23.8325918+05:30" | [0] [2043481607] Download CDR recording url http://cdr.connectandsell.com/php/api.php?task=getVoiceRecording&user=deepak&password=il0vecas&params={"cdrId":"396612847"}
+2025-09-02 19:42:29.897 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:29.8970215+05:30" | [0] [2043481607] Downloaded CDR recording
+2025-09-02 19:42:30.184 +05:30 [INF] Executed DbCommand (269ms) [Parameters=[p0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+EXEC [dbo].[p_GetAgentCallTransferedTimeDifference] @LeadTransitID = @p0
+2025-09-02 19:42:30.207 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:30.2072410+05:30" | [0] [2043481607] Started Converting WAV to Mp3
+2025-09-02 19:42:31.063 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:31.0633588+05:30" | [0] [2043481607] Ended Converting WAV to Mp3
+2025-09-02 19:42:31.065 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:31.0657432+05:30" | [0] [2043481607] Copy Recordings to GCS And Content Server
+2025-09-02 19:42:31.067 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:31.0679746+05:30" | [0] [2043481607] Copied Recordings to Content Server
+2025-09-02 19:42:31.135 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:31.1352242+05:30" | [0] [2043481607] Copied Recordings to Content Server
+2025-09-02 19:42:31.141 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:31.1419603+05:30" | [0] [2043481607] Copied Recordings to Content Server
+2025-09-02 19:42:34.272 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:34.2728217+05:30" | [0] [2043481607] Copied Recordings to GCS
+2025-09-02 19:42:34.661 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:34.6614694+05:30" | [0] [2043481607] Copied Recordings to GCS
+2025-09-02 19:42:34.780 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:34.7802010+05:30" | [0] [2043481607] Copied Recordings to GCS
+2025-09-02 19:42:34.786 +05:30 [INF] CorrelationId: 61840b5b-3263-4fc8-abbb-87f9ae3143c4 | Timestamp: "2025-09-02T19:42:34.7860169+05:30" | Recording Job Ended
+2025-09-02 19:42:34.802 +05:30 [INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType1`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2025-09-02 19:42:34.832 +05:30 [INF] Executed action CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob) in 21247.6644ms
+2025-09-02 19:42:34.836 +05:30 [INF] Executed endpoint 'CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob)'
+2025-09-02 19:42:34.851 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/api/RecordingJob/executerecordingjob?companyId=0&leadtransitId=2043481607 - 200 null application/json; charset=utf-8 21342.815ms
+2025-09-02 19:43:41.550 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/api/RecordingJob/executerecordingjob?companyId=0&leadtransitId=2043481607 - null null
+2025-09-02 19:43:41.560 +05:30 [INF] Executing endpoint 'CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob)'
+2025-09-02 19:43:41.561 +05:30 [INF] Route matched with {action = "Execute", controller = "RecordingJob"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Execute(System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], Int32, Int32) on controller CASRecordingFetchJob.Controllers.RecordingJobController (CASRecordingFetchJob).
+2025-09-02 19:43:50.041 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:43:50.0413078+05:30" | Recording Job Started
+2025-09-02 19:43:57.535 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:43:57.5328324+05:30" | Fetching company ids to process recording job
+2025-09-02 19:43:57.912 +05:30 [INF] Executed DbCommand (277ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[ID]
+FROM [t_Company] AS [t]
+WHERE [t].[IsDeleted] = CAST(0 AS bit)
+2025-09-02 19:43:58.201 +05:30 [INF] Executed DbCommand (279ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CompanyId]
+FROM [cas_CompanySetting] AS [c]
+WHERE [c].[SettingKey] = N'DisableRecordingDownloadFromJob' AND [c].[SettingValue] = N'True'
+2025-09-02 19:43:58.206 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:43:58.2067829+05:30" | DisableRecordingDownloadFromJob CompanyIds System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:43:58.488 +05:30 [INF] Executed DbCommand (276ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CompanyId]
+FROM [cas_CompanySetting] AS [c]
+WHERE [c].[SettingKey] = N'EnableRealTimeRecording' AND [c].[SettingValue] = N'True'
+2025-09-02 19:43:58.496 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:43:58.4967379+05:30" | EnableRealTimeRecording CompanyIds System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:43:58.501 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:43:58.5012513+05:30" | Removed Company Ids from Job System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:43:59.281 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:43:59.2813177+05:30" | Company Ids to Process for Job System.Collections.Generic.List`1[System.Int32]
+2025-09-02 19:44:03.876 +05:30 [INF] Executed DbCommand (274ms) [Parameters=[@__leadtransitId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT COALESCE([c].[LeadTransitId], 0) AS [LeadtransitId], COALESCE([t].[LeadCatchTime], '0001-01-01T00:00:00.0000000') AS [LeadCatchTime], COALESCE([t].[PrimaryNumberIndex], 0) AS [PrimaryNumberIndex], COALESCE([t].[ContactTel1], N'') AS [ContactTel1], COALESCE([t].[ContactTel2], N'') AS [ContactTel2], COALESCE([t].[ContactTel3], N'') AS [ContactTel3], COALESCE([t].[BestPhoneNumber], N'') AS [BestPhoneNumber], COALESCE([t].[CallType], CAST(0 AS tinyint)) AS [CallType], COALESCE([t].[ClientId], 0) AS [ClientId]
+FROM [cas_Note] AS [c]
+INNER JOIN [t_Call] AS [t] ON [c].[LeadTransitId] = [t].[LeadTransitId]
+WHERE [c].[LeadTransitId] = @__leadtransitId_0
+2025-09-02 19:44:18.587 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:44:18.5877462+05:30" | Conversation Count 1
+2025-09-02 19:44:24.815 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:44:24.8158013+05:30" | [0] [2043481607] Started Processing Recording for LeadtransitId 2043481607, Conversation on 8/19/2025 8:06:29 AM PST
+2025-09-02 19:44:24.818 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:44:24.8183291+05:30" | [0] [2043481607] File already exist - 2043481607.mp3
+2025-09-02 19:44:24.820 +05:30 [INF] CorrelationId: 6b57b745-2fe6-4183-8fde-b116b6f32345 | Timestamp: "2025-09-02T19:44:24.8206027+05:30" | Recording Job Ended
+2025-09-02 19:44:24.822 +05:30 [INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType1`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2025-09-02 19:44:24.824 +05:30 [INF] Executed action CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob) in 43261.0872ms
+2025-09-02 19:44:24.825 +05:30 [INF] Executed endpoint 'CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob)'
+2025-09-02 19:44:24.826 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/api/RecordingJob/executerecordingjob?companyId=0&leadtransitId=2043481607 - 200 null application/json; charset=utf-8 43276.3464ms
+2025-09-02 19:44:48.821 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7108/api/RecordingJob/executerecordingjob?companyId=0&leadtransitId=2043481607 - null null
+2025-09-02 19:44:48.832 +05:30 [INF] Executing endpoint 'CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob)'
+2025-09-02 19:44:48.833 +05:30 [INF] Route matched with {action = "Execute", controller = "RecordingJob"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Execute(System.Nullable`1[System.DateTime], System.Nullable`1[System.DateTime], Int32, Int32) on controller CASRecordingFetchJob.Controllers.RecordingJobController (CASRecordingFetchJob).
+2025-09-02 19:44:53.604 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:44:53.6044699+05:30" | Recording Job Started
+2025-09-02 19:44:54.527 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:44:54.5275429+05:30" | Fetching company ids to process recording job
+2025-09-02 19:44:54.866 +05:30 [INF] Executed DbCommand (277ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[ID]
+FROM [t_Company] AS [t]
+WHERE [t].[IsDeleted] = CAST(0 AS bit)
+2025-09-02 19:44:55.163 +05:30 [INF] Executed DbCommand (275ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CompanyId]
+FROM [cas_CompanySetting] AS [c]
+WHERE [c].[SettingKey] = N'DisableRecordingDownloadFromJob' AND [c].[SettingValue] = N'True'
+2025-09-02 19:44:55.170 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:44:55.1707435+05:30" | DisableRecordingDownloadFromJob CompanyIds System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:44:55.452 +05:30 [INF] Executed DbCommand (274ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [c].[CompanyId]
+FROM [cas_CompanySetting] AS [c]
+WHERE [c].[SettingKey] = N'EnableRealTimeRecording' AND [c].[SettingValue] = N'True'
+2025-09-02 19:44:55.458 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:44:55.4580156+05:30" | EnableRealTimeRecording CompanyIds System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:44:55.460 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:44:55.4609722+05:30" | Removed Company Ids from Job System.Collections.Generic.List`1[System.Int32] 
+2025-09-02 19:45:23.698 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:45:23.6986160+05:30" | Company Ids to Process for Job System.Collections.Generic.List`1[System.Int32]
+2025-09-02 19:45:24.920 +05:30 [INF] Executed DbCommand (275ms) [Parameters=[@__leadtransitId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT COALESCE([c].[LeadTransitId], 0) AS [LeadtransitId], COALESCE([t].[LeadCatchTime], '0001-01-01T00:00:00.0000000') AS [LeadCatchTime], COALESCE([t].[PrimaryNumberIndex], 0) AS [PrimaryNumberIndex], COALESCE([t].[ContactTel1], N'') AS [ContactTel1], COALESCE([t].[ContactTel2], N'') AS [ContactTel2], COALESCE([t].[ContactTel3], N'') AS [ContactTel3], COALESCE([t].[BestPhoneNumber], N'') AS [BestPhoneNumber], COALESCE([t].[CallType], CAST(0 AS tinyint)) AS [CallType], COALESCE([t].[ClientId], 0) AS [ClientId]
+FROM [cas_Note] AS [c]
+INNER JOIN [t_Call] AS [t] ON [c].[LeadTransitId] = [t].[LeadTransitId]
+WHERE [c].[LeadTransitId] = @__leadtransitId_0
+2025-09-02 19:45:29.762 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:45:29.7626885+05:30" | Conversation Count 1
+2025-09-02 19:45:39.859 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:45:39.8599113+05:30" | [0] [2043481607] Started Processing Recording for LeadtransitId 2043481607, Conversation on 8/19/2025 8:06:29 AM PST
+2025-09-02 19:45:52.476 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:45:52.4763102+05:30" | [0] [2043481607] File already exist - 2043481607.mp3
+2025-09-02 19:45:58.094 +05:30 [INF] CorrelationId: f503a231-ec2d-4cb9-a43b-651a64b5044d | Timestamp: "2025-09-02T19:45:58.0943716+05:30" | Recording Job Ended
+2025-09-02 19:45:58.095 +05:30 [INF] Executing OkObjectResult, writing value of type '<>f__AnonymousType1`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2025-09-02 19:45:58.097 +05:30 [INF] Executed action CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob) in 69260.7331ms
+2025-09-02 19:45:58.102 +05:30 [INF] Executed endpoint 'CASRecordingFetchJob.Controllers.RecordingJobController.Execute (CASRecordingFetchJob)'
+2025-09-02 19:45:58.104 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7108/api/RecordingJob/executerecordingjob?companyId=0&leadtransitId=2043481607 - 200 null application/json; charset=utf-8 69283.3799ms

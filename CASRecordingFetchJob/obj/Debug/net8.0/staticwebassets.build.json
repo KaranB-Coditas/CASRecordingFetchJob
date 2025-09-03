@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "O/UqpQ1uDOoxJisRmBQVY7C2bsoHXYtKMcOuFZ5Hvqg=",
+  "Source": "CASRecordingFetchJob",
+  "BasePath": "_content/CASRecordingFetchJob",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
