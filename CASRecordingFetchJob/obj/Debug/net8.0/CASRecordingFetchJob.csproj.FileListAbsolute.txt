@@ -27,7 +27,6 @@ C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\ob
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.CASRecordingFetchJob.props
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.CASRecordingFetchJob.props
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\staticwebassets.pack.json
-C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\CASRecor.D8889B0A.Up2Date
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\CASRecordingFetchJob.dll
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\refint\CASRecordingFetchJob.dll
@@ -133,3 +132,4 @@ C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\bi
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\bin\Debug\net8.0\Serilog.Sinks.File.dll
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\bin\Debug\net8.0\Serilog.Sinks.GoogleCloudLogging.dll
 C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\bin\Debug\net8.0\Serilog.Sinks.PeriodicBatching.dll
+C:\Users\Coditas-Admin\source\repos\CASRecordingFetchJob\CASRecordingFetchJob\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

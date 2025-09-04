@@ -2,7 +2,7 @@
   {
     "ContainingType": "CASRecordingFetchJob.Controllers.RecordingJobController",
     "Method": "Execute",
-    "RelativePath": "api/RecordingJob/executerecordingjob",
+    "RelativePath": "api/RecordingJob/Execute",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

@@ -13,7 +13,7 @@ namespace CASRecordingFetchJob.Controllers
         {
             _recordingJobService = recordingJobService;
         }
-        [HttpGet("executerecordingjob")]
+        [HttpGet("Execute")]
         public async Task<IActionResult> Execute([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null, [FromQuery] int companyId = 0, [FromQuery] int leadtransitId = 0)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault()

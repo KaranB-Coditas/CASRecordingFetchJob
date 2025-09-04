@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/RecordingJob/executerecordingjob": {
+    "/api/RecordingJob/Execute": {
       "get": {
         "tags": [
           "RecordingJob"

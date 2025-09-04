@@ -60,6 +60,11 @@ namespace CASRecordingFetchJob.Services
             if(string.IsNullOrEmpty(correlationId))
                 correlationId = Guid.NewGuid().ToString();
 
+            var recordingJobResponse = new RecordingJobResponse
+            {
+                CorrelationId = correlationId
+            };
+
             _logger.Info("Recording Job Started", correlationId);
 
             if (!CheckRecordJobEnabled())
@@ -68,12 +73,13 @@ namespace CASRecordingFetchJob.Services
                 return new BadRequestObjectResult(new { error = "Recording job disabled" });
             }
 
-            var companyIdsToProcess = await GetCompanyIdsAsync(correlationId, companyId);
+            var companyIdsToProcess = await GetCompanyIdsAsync(correlationId, companyId, leadtransitId);
             if (companyIdsToProcess == null || companyIdsToProcess.Count == 0)
             {
                 _logger.Info("No Company present for recording job", correlationId);
                 return new BadRequestObjectResult(new { error = "No Company Ids present for recording job" });
             }
+            recordingJobResponse.CompanyIdsToProcess = companyIdsToProcess;
             _logger.Info($"Company Ids to Process for Job {string.Join(", ", companyIdsToProcess)}", correlationId);
 
             var callDetails = await GetCallDetailsAsync(
@@ -101,8 +107,10 @@ namespace CASRecordingFetchJob.Services
                 _logger.Info($"No matching calls", correlationId);
                 return new BadRequestObjectResult(new { error = "No matching calls" });
             }
+            recordingJobResponse.TotalConversationFetched = conversationIds.Count;
             _logger.Info($"Conversation Count {conversationIds.Count}", correlationId);
 
+            var processDetails = new ConcurrentBag<RecordingDetails>();
             var successfulIds = new ConcurrentBag<int>();
             var failedIds = new ConcurrentBag<int>();
             var maxDegreeOfParallelism = _config.GetValue<int?>("MaxDegreeOfParallelism") ?? 1;
@@ -111,6 +119,7 @@ namespace CASRecordingFetchJob.Services
                 new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
                 async (id, cancellationToken) =>
                 {
+                    var recordingJobInfo = new RecordingDetails { LeadTransitId = id };
                     try
                     {
                         var agentTrimTime = 0;
@@ -140,6 +149,7 @@ namespace CASRecordingFetchJob.Services
                         string audioFileName = Path.Combine(recordingsBasePath, id.ToString() + GetSupportedAudioFormat());
                         if (File.Exists(audioFileName))
                         {
+                            recordingJobInfo.IsFilePresent = true;
                             _logger.Info($"[{companyId}] [{leadtransitId}] File already exist - {id}{GetSupportedAudioFormat()}",correlationId);
                             successfulIds.Add(id);
                             return;
@@ -164,13 +174,9 @@ namespace CASRecordingFetchJob.Services
                             failedIds.Add(id);
                             return;
                         }
+                        recordingJobInfo.IsFetchedFromCDR = true;
 
-                        var convertedRecordings = await ConvertWavToMp3VariantsAsync(
-                            cdrRecording,
-                            id,
-                            correlationId,
-                            agentTrimTime,
-                            companyId);
+                        var convertedRecordings = await ConvertWavToMp3VariantsAsync(cdrRecording, id, correlationId, agentTrimTime, companyId);
 
                         if (convertedRecordings == null || convertedRecordings.Count == 0)
                         {
@@ -178,15 +184,20 @@ namespace CASRecordingFetchJob.Services
                             failedIds.Add(id);
                             return;
                         }
+                        recordingJobInfo.IsConvertedToMp3Variants = true;
 
-                        await MovingToGCSAndContentServer(
-                            convertedRecordings,
-                            recordingsBasePath,
-                            gcsRecordingPath,
-                            correlationId,
-                            leadtransitId,
-                            companyId);
+                        var MovingToContentServerResult = await MovingToContentServerTask(convertedRecordings, recordingsBasePath, correlationId, leadtransitId, companyId);
+                        recordingJobInfo.IsMovedToContentServer = MovingToContentServerResult;
 
+                        var MovingToGCSResult = await MovingToGCSTask(convertedRecordings, gcsRecordingPath, correlationId, leadtransitId, companyId);
+                        recordingJobInfo.IsMovedToGCS = MovingToGCSResult;
+
+                        if (!MovingToContentServerResult || !MovingToGCSResult)
+                        {
+                            _logger.Info($"[{companyId}] [{leadtransitId}] Recording failed to move to content server or GCS", correlationId);
+                            failedIds.Add(id);
+                            return;
+                        }
                         successfulIds.Add(id);
                     }
                     catch (Exception ex)
@@ -194,13 +205,21 @@ namespace CASRecordingFetchJob.Services
                         _logger.Error($"[{leadtransitId}] Error processing {id}: {ex.Message}", ex, correlationId);
                         failedIds.Add(id);
                     }
+                    finally
+                    {
+                        processDetails.Add(recordingJobInfo);
+                    }
                 });
+
+            recordingJobResponse.SuccessfulCount = successfulIds.Count;
+            recordingJobResponse.FailedCount = failedIds.Count;
+            recordingJobResponse.RecordingProcessDetails = processDetails.ToList();
 
             _logger.Info($"SuccessfulIds Count {successfulIds.Count}, FailedIds Count {failedIds.Count}",correlationId);
             _logger.Info($"FailedIds LeadtransitId {string.Join(", ", failedIds)}", correlationId);
 
             _logger.Info("Recording Job Ended", correlationId);
-            return new OkObjectResult(new { status = "success" });
+            return new OkObjectResult(recordingJobResponse);
         }
 
         public int GetAgentTrimTime(List<Conversation> conversation, Dictionary<int, DateTime> agentInitiatedConversationPhoneCalls)
@@ -243,15 +262,15 @@ namespace CASRecordingFetchJob.Services
             {
                 _logger.Info($"[{companyId}] [{leadtransitId}] Copy Recordings to GCS And Content Server", correlationId);
 
-                var tasks = new List<Task>();
+                var tasks = new List<Task<bool>>();
 
                 foreach (var recording in recordings)
                 {
                     tasks.Add(MoveRecordingsToContentServer(recording, recordingBasePath, correlationId, leadtransitId, companyId));
-                    tasks.Add(MoveRecordingsToGCS(recording, recordingBasePath, gcsRecordingPath, correlationId, leadtransitId, companyId));
+                    tasks.Add(MoveRecordingsToGCS(recording, gcsRecordingPath, correlationId, leadtransitId, companyId));
                 }
 
-                await Task.WhenAll(tasks);
+                var result = await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
@@ -260,38 +279,92 @@ namespace CASRecordingFetchJob.Services
             
         }
 
-        public async Task MoveRecordingsToContentServer(KeyValuePair<string, Stream> recording, string recordingBasePath, string correlationId, int leadtransitId, int companyId)
+        public async Task<bool> MovingToGCSTask(Dictionary<string, Stream> recordings, string gcsRecordingPath, string correlationId, int leadtransitId, int companyId)
+        {
+            try
+            {
+                _logger.Info($"[{companyId}] [{leadtransitId}] Copy Recordings to GCS", correlationId);
+
+                var tasks = new List<Task<bool>>();
+                foreach (var recording in recordings)
+                {
+                    tasks.Add(MoveRecordingsToGCS(recording, gcsRecordingPath, correlationId, leadtransitId, companyId));
+                }
+                await Task.WhenAll(tasks);
+                var results = await Task.WhenAll(tasks);
+
+                return results.All(r => r); ;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"[{companyId}] [{leadtransitId}] Recordings Copied to GCS Failed", ex, correlationId);
+                return false;
+            }
+
+        }
+
+        public async Task<bool> MovingToContentServerTask(Dictionary<string, Stream> recordings, string recordingBasePath, string correlationId, int leadtransitId, int companyId)
+        {
+            try
+            {
+                _logger.Info($"[{companyId}] [{leadtransitId}] Copy Recordings to Content Server", correlationId);
+
+                var tasks = new List<Task<bool>>();
+                foreach (var recording in recordings)
+                {
+                    tasks.Add(MoveRecordingsToContentServer(recording, recordingBasePath, correlationId, leadtransitId, companyId));
+                }
+                await Task.WhenAll(tasks);
+                var results = await Task.WhenAll(tasks);
+
+                return results.All(r => r); ;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"[{companyId}] [{leadtransitId}] Recordings Copied to Content Server Failed", ex, correlationId);
+                return false;
+            }
+
+        }
+
+        public async Task<bool> MoveRecordingsToContentServer(KeyValuePair<string, Stream> recording, string recordingBasePath, string correlationId, int leadtransitId, int companyId)
         {
             try
             {
                 var filePath = Path.Combine(recordingBasePath, recording.Key);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true))
                 {
                     await recording.Value.CopyToAsync(fileStream);
                 }
-                _logger.Info($"[{companyId}] [{leadtransitId}] Copied Recordings to Content Server", correlationId);
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.Error($"[{companyId}] [{leadtransitId}] Copied Recordings to Content Server Failed", ex, correlationId);
+                _logger.Error($"[{companyId}] [{leadtransitId}] Recordings {recording.Key} Copied to Content Server Failed", ex, correlationId);
+                return false;
             }
         }
 
-        public async Task MoveRecordingsToGCS(KeyValuePair<string, Stream> recording, string recordingBasePath, string gcsRecordingPath, string correlationId, int leadtransitId, int companyId)
+        public async Task<bool> MoveRecordingsToGCS(KeyValuePair<string, Stream> recording, string gcsRecordingPath, string correlationId, int leadtransitId, int companyId)
         {
             try
             {
                 var key = $"{gcsRecordingPath}/{recording.Key}";
                 var contentType = GetSupportedAudioFormat() == ".mp3" ? "audio/mpeg" : "audio/wav";
                 await _gcsHelper.UploadRecordingAsync(key, recording.Value, contentType);
-                _logger.Info($"[{companyId}] [{leadtransitId}] Copied Recordings to GCS", correlationId);
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.Error($"[{companyId}] [{leadtransitId}] Copied Recordings to GCS Failed", ex, correlationId);
+                _logger.Error($"[{companyId}] [{leadtransitId}] Recordings {recording.Key} Copied to GCS Failed", ex, correlationId);
+                return false;
             }
             
         }
@@ -665,12 +738,14 @@ namespace CASRecordingFetchJob.Services
                             {
                                 LeadtransitId = note.LeadTransitId ?? 0,
                                 LeadCatchTime = call.LeadCatchTime ?? DateTime.MinValue,
+                                CallSendTime = call.CallSendTime ?? DateTime.MinValue,
                                 PrimaryNumberIndex = call.PrimaryNumberIndex ?? 0,
                                 ContactTel1 = call.ContactTel1 ?? string.Empty,
                                 ContactTel2 = call.ContactTel2 ?? string.Empty,
                                 ContactTel3 = call.ContactTel3 ?? string.Empty,
                                 BestPhoneNumber = call.BestPhoneNumber ?? string.Empty,
                                 CallType = call.CallType ?? 0,
+                                TalkTime = call.TalkTime ?? 0,
                                 ClientId = call.ClientId ?? 0
                             };
                 return await query.ToListAsync();
@@ -691,11 +766,29 @@ namespace CASRecordingFetchJob.Services
                 .ToListAsync();
         }
 
-        public async Task<List<int>> GetCompanyIdsAsync(string correlationId, int companyId = 0)
+        public async Task<int> GetCompanyIdByLeadTransitId(int leadtransitId)
+        {
+            try
+            {
+                var companyId = await _db.t_Call
+                    .Where(a => a.LeadTransitId == leadtransitId)
+                    .Select(a => a.ClientId)
+                    .FirstOrDefaultAsync();
+                return companyId ?? 0;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<List<int>> GetCompanyIdsAsync(string correlationId, int companyId = 0, int leadtransitId = 0)
         {
             _logger.Info("Fetching company ids to process recording job", correlationId);
             if (companyId > 0)
                 return [companyId];
+            if(leadtransitId > 0)
+                return [await GetCompanyIdByLeadTransitId(leadtransitId)];
 
             var activeCompanyIds = new List<int>();
             try

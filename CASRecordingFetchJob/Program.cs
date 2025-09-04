@@ -41,8 +41,8 @@ builder.Services.AddScoped<LoggerHelper>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var enableSwagger = builder.Configuration.GetValue<bool>("EnableSwaggerUI");
+if (enableSwagger)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -51,7 +51,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
