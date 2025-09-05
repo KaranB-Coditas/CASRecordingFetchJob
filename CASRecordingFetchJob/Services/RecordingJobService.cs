@@ -290,10 +290,9 @@ namespace CASRecordingFetchJob.Services
                 {
                     tasks.Add(MoveRecordingsToGCS(recording, gcsRecordingPath, correlationId, leadtransitId, companyId));
                 }
-                await Task.WhenAll(tasks);
                 var results = await Task.WhenAll(tasks);
 
-                return results.All(r => r); ;
+                return results.All(r => r);
             }
             catch (Exception ex)
             {
@@ -314,7 +313,6 @@ namespace CASRecordingFetchJob.Services
                 {
                     tasks.Add(MoveRecordingsToContentServer(recording, recordingBasePath, correlationId, leadtransitId, companyId));
                 }
-                await Task.WhenAll(tasks);
                 var results = await Task.WhenAll(tasks);
 
                 return results.All(r => r);
