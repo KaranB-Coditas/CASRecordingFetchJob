@@ -317,7 +317,7 @@ namespace CASRecordingFetchJob.Services
                 await Task.WhenAll(tasks);
                 var results = await Task.WhenAll(tasks);
 
-                return results.All(r => r); ;
+                return results.All(r => r);
             }
             catch (Exception ex)
             {
